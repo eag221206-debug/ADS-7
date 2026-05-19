@@ -1,24 +1,13 @@
-// Copyright 2021 NNTU-CS
+// Copyright 2022 NNTU-CS
+
+#include <stdexcept>
 #include "train.h"
 
 Train::Train() : countOp(0), first(nullptr) {}
 
-Train::~Train() {
-    if (!first) {
-        return;
-    }
-    Car* current = first->next;
-    while (current != first) {
-        Car* to_delete = current;
-        current = current->next;
-        delete to_delete;
-    }
-    delete first;
-}
-
 void Train::addCar(bool light) {
     Car* newCar = new Car{light, nullptr, nullptr};
-    if (!first) {
+    if (first == nullptr) {
         first = newCar;
         first->next = first;
         first->prev = first;
@@ -31,47 +20,47 @@ void Train::addCar(bool light) {
     }
 }
 
-int Train::getLength() {
-    countOp = 0;
-    if (!first || first->next == first) {
-        return first ? 1 : 0;
-    }
-
-    Car* base = first;
-    base->light = !base->light;
-
-    for (int d = 1; ; ++d) {
-        Car* probe = base;
-        for (int i = 0; i < d; ++i) {
-            probe = probe->next;
-            countOp++;
-        }
-
-        probe->light = !probe->light;
-
-        for (int i = 0; i < d; ++i) {
-            probe = probe->prev;
-            countOp++;
-        }
-
-        if (base->light != probe->light) {
-             return d;
-        }
-
-        for (int i = 0; i < d; ++i) {
-            probe = probe->next;
-            countOp++;
-        }
-        probe->light = !probe->light;
-
-        for (int i = 0; i < d; ++i) {
-            probe = probe->prev;
-            countOp++;
-        }
-    }
-    return -1;
-}
-
 int Train::getOpCount() {
     return countOp;
+}
+
+int Train::getLength() {
+    countOp = 0;
+    if (first == nullptr) {
+        return 0;
+    }
+    if (first->next == first) {
+        return 1;
+    }
+
+    Car* home = first;
+    home->light = true;
+
+    int distance = 1;
+    while (true) {
+        // Идем вперед на `distance` шагов от дома
+        Car* probe = home;
+        for (int i = 0; i < distance; ++i) {
+            probe = probe->next;
+            countOp++;
+        }
+
+        if (probe->light) {
+            probe->light = false; 
+
+            Car* return_trip_car = probe;
+            for (int i = 0; i < distance; ++i) {
+                return_trip_car = return_trip_car->prev;
+                countOp++;
+            }
+
+            if (!return_trip_car->light) {
+                probe->light = true;
+                return distance;
+            } else {
+                probe->light = true;
+            }
+        }
+        distance++;
+    }
 }
