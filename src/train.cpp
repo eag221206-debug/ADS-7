@@ -1,4 +1,3 @@
-```cpp
 // Copyright 2021 NNTU-CS
 #include "train.h"
 
@@ -62,4 +61,3 @@ int Train::getLength() {
 int Train::getOpCount() {
   return countOp;
 }
-```
