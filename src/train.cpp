@@ -9,7 +9,7 @@ Train::Train() {
 void Train::addCar(bool light) {
   Car* newCar = new Car;
   newCar->light = light;
-  
+
   if (first == nullptr) {
     first = newCar;
     first->next = first;
@@ -40,7 +40,7 @@ int Train::getLength() {
 
     if (current->light) {
       current->light = false;
-      
+
       for (int i = 0; i < steps; i++) {
         current = current->prev;
         countOp++;
